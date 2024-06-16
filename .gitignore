@@ -1,0 +1,5 @@
+.venv/
+.vscode/
+artifacts/data
+logs/
+__pycache__
