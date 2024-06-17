@@ -38,7 +38,7 @@ class TrainPipeline:
         logging.info(f"Testing result -> l: {t_loss/ t_batches}, a: {t_acc/t_batches}")
 
     def _train_loop(self, epoch: int):
-        for x in range(epoch):
+        for e in range(epoch):
             t_loss, t_acc = 0, 0
 
             for batch, (X, y) in enumerate(self.train_dataset):
@@ -48,7 +48,7 @@ class TrainPipeline:
             t_batches = len(self.train_dataset)
 
             logging.info(
-                f"Epoch {epoch + 1} -> l: {t_loss/ t_batches}, a: {t_acc/ t_batches}"
+                f"Epoch {e + 1} -> l: {t_loss/ t_batches}, a: {t_acc/ t_batches}"
             )
 
     def _train_step(self, X: torch.Tensor, y: torch.Tensor):
