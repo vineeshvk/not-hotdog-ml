@@ -3,8 +3,10 @@ from torch.optim import Adam
 from torch import nn
 from src.data.data_ingestion import DataIngestion
 from src.models.hotdog_model_v0 import HotdogModelV0
+from src.models.hotdog_model_v1 import HotdogModelV1
 from src.utils.logger import logging
 from torchmetrics.functional import accuracy
+from tqdm import tqdm
 
 
 class TrainPipeline:
@@ -12,15 +14,17 @@ class TrainPipeline:
         self.data_loader = DataIngestion()
         self.train_dataset, self.test_dataset = self.data_loader.get_data()
 
-        self.model = HotdogModelV0()
+        self.model = HotdogModelV1()
 
         self.loss_fn = nn.BCEWithLogitsLoss()
         self.optimizer = Adam(params=self.model.parameters(), lr=0.01)
 
     def start_training(self):
         try:
-            self._train_loop(epoch=1)
+            self._train_loop(epoch=10)
             self.get_test_stats()
+
+            torch.save(self.model, "model.pt")
 
         except Exception as e:
             logging.error(e)
@@ -29,20 +33,22 @@ class TrainPipeline:
         self.model.eval()
         with torch.inference_mode():
             t_loss, t_acc = 0, 0
+
             for batch, (X, y) in enumerate(self.test_dataset):
                 y_pred = self.model(X).squeeze()
                 t_loss += self.loss_fn(y_pred, y.to(torch.float))
                 t_acc += accuracy(y_pred, y, "binary")
+
         t_batches = len(self.test_dataset)
 
         logging.info(f"Testing result -> l: {t_loss/ t_batches}, a: {t_acc/t_batches}")
 
     def _train_loop(self, epoch: int):
-        for e in range(epoch):
+        for e in tqdm(range(epoch)):
             t_loss, t_acc = 0, 0
 
             for batch, (X, y) in enumerate(self.train_dataset):
-                loss, acc = self._train_step(X,y)
+                loss, acc = self._train_step(X, y)
                 t_loss += loss
                 t_acc += acc
             t_batches = len(self.train_dataset)
