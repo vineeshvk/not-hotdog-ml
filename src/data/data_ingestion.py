@@ -1,4 +1,5 @@
 import torch
+from src.data.data_transformer import DataTransformer
 from src.utils.common_utils import CommonUtils
 from src.utils.logger import logging
 
@@ -24,11 +25,12 @@ class DataIngestion:
         self.download_url = DATA_DOWNLOAD_URL
         self.download_save_path = HOTDOG_DATASET_ZIP_FILE_PATH
         self.extracted_file_path = DATASET_EXTRACTED_DIR
+        self.transformer = DataTransformer()
 
     def get_data(self):
-        self.download_and_extract()
+        # self.download_and_extract()
         train_dataset = self.create_dataset(dir=self.extracted_file_path + "train")
-        test_dataset = self.create_dataset(dir=self.extracted_file_path + "test")
+        test_dataset = self.create_dataset(dir=self.extracted_file_path + "holdout")
 
         return train_dataset, test_dataset
 
@@ -41,14 +43,8 @@ class DataIngestion:
         self.utils.zipFile(filePath, DATASET_DIR_PATH)
 
     def create_dataset(self, dir: str) -> DataLoader[torch.Tensor]:
-        transform = transforms.Compose(
-            [
-                transforms.Resize((128, 128)),
-                transforms.ToTensor(),
-            ]
-        )
 
-        dataset = datasets.ImageFolder(root=dir, transform=transform)
+        dataset = datasets.ImageFolder(root=dir, transform=self.transformer.transform)
         dataloader = DataLoader(dataset, batch_size=32, shuffle=True, num_workers=4)
 
         # Changing the hot dog mapping as it is loaded in reverse

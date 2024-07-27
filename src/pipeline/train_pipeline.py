@@ -14,7 +14,8 @@ class TrainPipeline:
         self.data_loader = DataIngestion()
         self.train_dataset, self.test_dataset = self.data_loader.get_data()
 
-        self.model = HotdogModelV1()
+        # self.model = HotdogModelV1()
+        self.model = torch.load("artifacts/models/model_v1.pt")
 
         self.loss_fn = nn.BCEWithLogitsLoss()
         self.optimizer = Adam(params=self.model.parameters(), lr=0.01)
@@ -37,6 +38,7 @@ class TrainPipeline:
             for batch, (X, y) in enumerate(self.test_dataset):
                 y_pred = self.model(X).squeeze()
                 t_loss += self.loss_fn(y_pred, y.to(torch.float))
+                print(["Test", y_pred, y])
                 t_acc += accuracy(y_pred, y, "binary")
 
         t_batches = len(self.test_dataset)
