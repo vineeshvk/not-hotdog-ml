@@ -21,7 +21,7 @@ class TrainPipeline:
 
     def start_training(self):
         try:
-            self._train_loop(epoch=10)
+            self._train_loop(epoch=50)
             self.get_test_stats()
 
             torch.save(self.model, "model.pt")
