@@ -22,10 +22,10 @@ class TrainPipeline:
 
     def start_training(self):
         try:
-            self._train_loop(epoch=50)
+            self._train_loop(epoch=30)
             self.get_test_stats()
 
-            torch.save(self.model, "model.pt")
+            torch.save(self.model, "artifacts/models/model_v2.pt")
 
         except Exception as e:
             logging.error(e)
