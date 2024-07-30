@@ -75,7 +75,7 @@ curl http://localhost:5000/run_train
 **Method**: POST \
 Is it a hotdog? Let's find out:
 ```
-curl -X POST -F "file=@path/to/your/suspicious_food.jpg" http://localhost:5000/predict
+curl -X POST -F "file=@path/food.jpg" http://localhost:5000/predict
 ```
 Response:
 ```json 
